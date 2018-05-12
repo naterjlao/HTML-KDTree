@@ -3,10 +3,20 @@
 /* Code for the 2-dimensional tree visualizer */
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
+var WIDTH = canvas.getAttribute("width") 
+var HEIGHT = canvas.getAttribute("height")
+
+function center_x(x) {
+    return WIDTH/2 + x
+}
+
+function center_y(y) {
+    return HEIGHT/2 - y
+}
 
 /* 2 dimensional node class */
 class Node {
-    constructor(x,y,left,right) {
+    constructor(x,y,left=null,right=null) {
         this._x = x
         this._y = y
         this._left = left
@@ -19,8 +29,32 @@ class Node {
     get right() { return this._right }
     get x() { return this._x }
     get y() { return this._y }
+    
+    drawNode(split_dim="x",left_dist=0,right_dist=0,show_coordinates=false) {
+        var size = 5
+        var x = center_x(this.x)
+        var y = center_y(this.y)
+        
+        ctx.fillRect(x - size/2, y - size/2,size,size)
+        
+        if (split_dim == "x") {
+            ctx.beginPath()
+            ctx.moveTo(x,y - left_dist)
+            ctx.lineTo(x,y + right_dist)
+            ctx.stroke()
+        } else if (split_dim == "y") {
+            ctx.beginPath()
+            ctx.moveTo(x - left_dist,y)
+            ctx.lineTo(x + right_dist,y)
+            ctx.stroke()
+            
+        } else
+            throw "Invalid split dimension"
+    }
 }
 
+n = new Node(50,50)
+n.drawNode("y",50,50)
 
 /* Parsing Code */
 
