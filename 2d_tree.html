@@ -21,7 +21,16 @@
             </center>
         </div>
         <div class="column">
-            jfkdjf
+            Insert node:<br>
+            x-value: <input id="x_val" type="text" size=2>
+            y-value: <input id="y_val" type="text" size=2> 
+            show coordinates: <input id="show_coordinates" type="checkbox"> <br>
+            <button onclick="insert_node_button()">Insert Node</button>
+            <button onclick="clear_tree()">Clear</button>
+            <br> <br>
+            Paste treecode: <br>
+            <textarea id="treecode" rows=10 cols=30></textarea><br>
+            <button onclick="parse_treecode()">Enter</button>
         </div>
     </div>
     

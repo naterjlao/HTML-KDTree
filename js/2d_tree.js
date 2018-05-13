@@ -16,45 +16,87 @@ function center_y(y) {
 
 /* 2 dimensional node class */
 class Node {
-    constructor(x,y,left=null,right=null) {
+    constructor(x,y,split_dim,left=null,right=null) {
         this._x = x
         this._y = y
+        this._split_dim = split_dim
         this._left = left
         this._right = right
     }
     
+    /* setters and getters */
     set left(left) { this._left = left }
-    set right(right) { this._right = right }
     get left() { return this._left }
+    set right(right) { this._right = right }
     get right() { return this._right }
+    set split_dim(d) { this._split_dim = d }
+    get split_dim() { return this._split_dim }
     get x() { return this._x }
     get y() { return this._y }
     
-    drawNode(split_dim="x",left_dist=0,right_dist=0,show_coordinates=false) {
+    insert(x,y) {
+        var split_dim = this.split_dim
+        var key = split_dim == "x" ? this.x : this.y
+        var new_key = split_dim == "x" ? x : y
+        
+        if (new_key < key) {
+            this.left = this.left == null ? new Node(x,y,split_dim=="x"?"y":"x") : this.left.insert(x,y)
+        } else {
+            this.right = this.right == null ? new Node(x,y,split_dim=="x"?"y":"x") : this.right.insert(x,y)
+        }
+        
+        return this
+    }
+    
+    draw(show_coordinates=false,left_bound=-WIDTH,right_bound=WIDTH, bottom_bound=-HEIGHT,top_bound=HEIGHT) {
         var size = 5
         var x = center_x(this.x)
         var y = center_y(this.y)
+        var split_dim = this.split_dim
         
+        /* draw the vertex point */
         ctx.fillRect(x - size/2, y - size/2,size,size)
         
+        /* drawing algorithm */
         if (split_dim == "x") {
             ctx.beginPath()
-            ctx.moveTo(x,y - left_dist)
-            ctx.lineTo(x,y + right_dist)
+            ctx.moveTo(x,center_y(bottom_bound))
+            ctx.lineTo(x,center_y(top_bound))
             ctx.stroke()
         } else if (split_dim == "y") {
             ctx.beginPath()
-            ctx.moveTo(x - left_dist,y)
-            ctx.lineTo(x + right_dist,y)
+            ctx.moveTo(center_x(left_bound),y)
+            ctx.lineTo(center_x(right_bound),y)
             ctx.stroke()
-            
         } else
             throw "Invalid split dimension"
+    
+        /* display the coordinates if specified */
+        if (show_coordinates)
+            ctx.fillText("("+this.x+","+this.y+")",x,y)
+        
+        /* recurse and draw left node*/
+        if (this.left != null) {
+            this.left.draw(
+                show_coordinates,
+                left_bound,
+                split_dim == "x" ? this.x : right_bound,
+                bottom_bound,
+                split_dim == "y" ? this.y : top_bound,
+                split_dim == "x" ? "y" : "x")
+        }
+        
+        if (this.right != null) {
+            this.right.draw(
+                show_coordinates,
+                split_dim == "x" ? this.x : left_bound,
+                right_bound,
+                split_dim == "y" ? this.y : bottom_bound,
+                top_bound,
+                split_dim == "x" ? "y" : "x")
+        }
     }
 }
-
-n = new Node(50,50)
-n.drawNode("y",50,50)
 
 /* Parsing Code */
 
@@ -89,7 +131,7 @@ function parse_coordinate(input) {
 }
 
 /* Parses the given string representation of a Node */
-function parse_node(input) {
+function parse_node(input,split_dim) {
     /* null case for a parse*/
     if (input.match(/^null/) != null)
         return [null, match_tok(input,"null")]
@@ -104,27 +146,53 @@ function parse_node(input) {
     input = match_tok(input,",") // match comma
     
     /* parse the left node */
-    parse_result = parse_node(input)
+    parse_result = parse_node(input,split_dim == "x" ? "y" : "x")
     left = parse_result[0]
     input = parse_result[1]
     
     input = match_tok(input,",") // match comma
 
     /* parse the right node */
-    parse_result = parse_node(input)
+    parse_result = parse_node(input,split_dim == "x" ? "y" : "x")
     right = parse_result[0]
     input = parse_result[1]
     
     input = match_tok(input,"}") // match end bracket
         
-    return [new Node(coordinates[0],coordinates[1],left,right), input]
+    return [new Node(coordinates[0],coordinates[1],split_dim,left,right), input]
+}
+
+var root = null
+
+function insert_node_button() {
+    var x = parseInt(document.getElementById("x_val").value)
+    var y = parseInt(document.getElementById("y_val").value)
+    
+    root = root == null ? new Node(x,y,"x") : root.insert(x,y)
+    
+    root.draw(document.getElementById("show_coordinates").value)
+}
+
+function clear_tree() {
+    root = null
+    ctx.clearRect(0,0,WIDTH,HEIGHT)
 }
 
 /* TESTING CODE */
+/*
 var parse
 var input1 = "{(3.4,6),null,null}"
 var input2 = "{(6,3),{(6.34,5),null,null},null}"
 var input3 = "{(8.54,2.123),{(43.6,3.14),null,null},{(6.78,9.32),null,null}}"
-var input4 = "{(1.2,3.7),null,{(x3,y3,z1),null,null}}"
+var input4 = "{(0,0),null,{(96,34),null,null}}"
 
-console.log(parse_node(input3))
+n = new Node(0,0,"x")
+n.insert(85,67)
+n.insert(60,10)
+n.insert(30,-10)
+n.insert(10,50)
+n.insert(11,50)
+n.insert(-20,-20)
+
+n.draw()
+*/
