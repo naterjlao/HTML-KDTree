@@ -120,18 +120,18 @@ error is thrown if encountered. */
 function parse_coordinate(input) {
     var prev, next, x, y
     prev = match_tok(input,"\\(") // match start bracket
-    next = match_tok(prev,"[\\d.]+") // lookahead
-    x = parseFloat(prev.match(/[\d\.]+/)) // parse first dim
+    next = match_tok(prev,"[\\d-]+") // lookahead
+    x = parseFloat(prev.match(/[\d\-]+/)) // parse first dim
     prev = match_tok(next,",") // match comma
-    next = match_tok(prev,"[\\d.]+") // lookahead
-    y = parseFloat(prev.match(/[\d\.]+/)) // parse the second dim
+    next = match_tok(prev,"[\\d-]+") // lookahead
+    y = parseFloat(prev.match(/[\d\-]+/)) // parse the second dim
     prev = match_tok(next,"\\)") // match end bracket
     
     return [[x,y],prev]
 }
 
 /* Parses the given string representation of a Node */
-function parse_node(input,split_dim) {
+function parse_node(input,split_dim="x") {
     /* null case for a parse*/
     if (input.match(/^null/) != null)
         return [null, match_tok(input,"null")]
@@ -162,7 +162,9 @@ function parse_node(input,split_dim) {
     return [new Node(coordinates[0],coordinates[1],split_dim,left,right), input]
 }
 
-var root = null
+
+/* HTML Event Code */
+var root
 
 function insert_node_button() {
     var x = parseInt(document.getElementById("x_val").value)
@@ -170,7 +172,21 @@ function insert_node_button() {
     
     root = root == null ? new Node(x,y,"x") : root.insert(x,y)
     
-    root.draw(document.getElementById("show_coordinates").value)
+    root.draw(true)
+}
+
+function parse_treecode_button() {
+    var input = document.getElementById("treecode").value.replace(/\s+/g,'')
+    clear_tree()
+    document.getElementById("message").innerHTML = ""
+    
+    try {
+        root = parse_node(input,"x")[0]
+    } catch(err) {
+        document.getElementById("message").innerHTML = err
+    }
+    
+    root.draw(true)
 }
 
 function clear_tree() {
@@ -178,21 +194,11 @@ function clear_tree() {
     ctx.clearRect(0,0,WIDTH,HEIGHT)
 }
 
-/* TESTING CODE */
-/*
-var parse
-var input1 = "{(3.4,6),null,null}"
-var input2 = "{(6,3),{(6.34,5),null,null},null}"
-var input3 = "{(8.54,2.123),{(43.6,3.14),null,null},{(6.78,9.32),null,null}}"
-var input4 = "{(0,0),null,{(96,34),null,null}}"
+function clear_textbox() {
+    clear_tree()
+    document.getElementById("treecode").value = ""
+}
 
-n = new Node(0,0,"x")
-n.insert(85,67)
-n.insert(60,10)
-n.insert(30,-10)
-n.insert(10,50)
-n.insert(11,50)
-n.insert(-20,-20)
+/* At startup */
+parse_treecode_button()
 
-n.draw()
-*/
