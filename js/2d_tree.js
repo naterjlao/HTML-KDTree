@@ -3,8 +3,8 @@
 /* Code for the 2-dimensional tree visualizer */
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
-var WIDTH = canvas.getAttribute("width") 
-var HEIGHT = canvas.getAttribute("height")
+const WIDTH = canvas.getAttribute("width") 
+const HEIGHT = canvas.getAttribute("height")
 
 function center_x(x) {
     return WIDTH/2 + x
@@ -40,9 +40,11 @@ class Node {
         var new_key = split_dim == "x" ? x : y
         
         if (new_key < key) {
-            this.left = this.left == null ? new Node(x,y,split_dim=="x"?"y":"x") : this.left.insert(x,y)
+            this.left = this.left == null ? 
+                new Node(x,y,split_dim=="x"?"y":"x") : this.left.insert(x,y)
         } else {
-            this.right = this.right == null ? new Node(x,y,split_dim=="x"?"y":"x") : this.right.insert(x,y)
+            this.right = this.right == null ? 
+                new Node(x,y,split_dim=="x"?"y":"x") : this.right.insert(x,y)
         }
         
         return this

@@ -1,10 +1,71 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <link rel="stylesheet" href="css/kd_tree.css">
+    </head>
     <title>3D Tree Visualizer</title>
     <center>
         <h1>3-Dimensional Tree Visualizer</h1>
         <i>author: <a href="http://natelao.com">Nathaniel Lao</a></i><br>
-        <h1><code>Work in progress...</code></h1>
-        <a href="index.html">HOME</a>
     </center>
+    
+    <div class="row">
+        <div class="column">
+            <center>
+                <canvas id="canvas"
+                        width="500" 
+                        height="500" 
+                        style="border:1px solid #c3c3c3;">
+                    canvas element unsupported
+                </canvas>
+            </center>
+        </div>
+        <div class="column">
+            Insert node:<br>
+            x-value: <input id="x_val" type="text" size=2>
+            y-value: <input id="y_val" type="text" size=2>
+            z-value: <input id="z_val" type="text" size=2>
+            <button onclick="insert_node_button()">Insert Node</button>
+            <button onclick="clear_tree()">Clear</button>
+            <br> <br>
+            Enter Treecode:<br>
+            <textarea id="treecode" rows=10 cols=70>{(0,0,0),
+  {(-50,50,0),
+    {(-20,-60,30),null,null},
+    {(-100,150,-100),
+      null,
+      {(-80,50,100),null,null}}},
+  {(50,-50,100),
+    null,
+    {(80,10,-50),null,null}}}</textarea><br>
+            <button onclick="parse_treecode_button()">Enter</button>
+            <button onclick="clear_textbox()">
+            Clear
+            </button>
+            <br><br>
+            Syntax:<br>
+            <code>
+                N -> {(X,Y,Z),L,R}|null<br>
+                L -> N<br>
+                R -> N<br>
+                where:<br>
+                -N is a node object or null (empty)<br>
+                -X is an integer number representing the x-coordinate of the node [-250,250]<br>
+                -Y is an integer number representing the y-coordinate of the node [-250,250]<br>
+                -Z is an integer number representing the z-coordinate of the node [-250,250]<br>
+                -L is the left child of a node<br>
+                -R is the right child of a node<br>
+            </code>
+            <p id="message"></p>
+            Need <a href="2d_tree.html">2 dimensions</a>?
+            <a href="index.html">HOME</a>
+        </div>
+    </div>
+    <center>Artistic Notes:<br>
+    Note that the lines do not represent the planar partitions of space, rather, they are orthogonal lines that are perpendicular to that plane. This was done in order to make the visuals more appealing since drawing planes might obscure other elements in the frame.
+    </center>
+    
+    <!--- CODE IMPORTS --->
+    <script src="js/math.js"></script>
+    <script src="js/3d_tree.js"></script>
 </html>
